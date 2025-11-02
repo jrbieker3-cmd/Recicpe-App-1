@@ -5,144 +5,186 @@
   <meta charset="UTF-8" />
   <title>Recipe Planner App</title>
   <style>
-
-    body {
-      font-family: sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f5f5f5;
-      color: #222;
-    }
-    .overlay {
-      padding: 20px;
-      margin: 20px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    .nav button { margin-right: 10px; }
-    .hidden { display: none; }
-    .planner-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .planner-cell {
-      background: #fff;
-      padding: 10px;
-      border-radius: 6px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-    }
-    .planner-thumb {
-      width: 100%;
-      height: 100px;
-      object-fit: cover;
-      border-radius: 6px;
-      margin-top: 5px;
-      cursor: pointer;
-    }
-    .planner-label {
-      text-align: center;
-      font-weight: bold;
-    }
-    .side-add, .side-remove {
-      font-size: 1rem;
-      padding: 2px 6px;
-      border-radius: 50%;
-      border: none;
-      cursor: pointer;
-    }
-    .side-add { background-color: #eee; }
-    .side-remove { background-color: #fdd; margin-left: 6px; }
-    .side-wrapper { display: flex; align-items: center; margin-top: 4px; }
-/* Responsive layout for tablets */
-@media (max-width: 768px) {
-  .planner-grid {
-    grid-template-columns: repeat(2, 1fr); /* 2 columns */
+<style>
+  /* Base styles */
+  body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f5f5f5;
+    color: #222;
   }
 
-  .planner-thumb {
-    height: 80px;
-  }
-
-  .nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .nav button {
-    flex: 1 1 45%;
-    margin-bottom: 10px;
+  .hidden {
+    display: none;
   }
 
   .overlay {
-    margin: 10px;
-    padding: 10px;
+    padding: 20px;
+    margin: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   }
 
-  #recipeDetailPage img,
-  #gallery img {
+  /* Responsive nav bar */
+  .responsive-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: auto;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    z-index: 1000;
   }
 
-  input, select, button, textarea {
+  .responsive-nav button {
+    flex: 1;
     font-size: 1rem;
     padding: 10px;
-    margin-bottom: 10px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-}
-
-/* Responsive layout for phones */
-@media (max-width: 480px) {
-  .planner-grid {
-    grid-template-columns: 1fr; /* 1 column */
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #333;
   }
 
-  .planner-cell {
+  .responsive-nav button:hover {
+    background-color: #f0f0f0;
+  }
+
+  /* Planner controls */
+  .planner-controls {
+    margin-top: 60px; /* space for nav bar */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .planner-controls input {
+    flex: 1;
     padding: 8px;
   }
 
-  .nav {
-    flex-direction: column;
+  /* Planner grid */
+  .planner-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    margin-top: 20px;
   }
 
-  .side-wrapper {
-    flex-direction: column;
-    align-items: flex-start;
+  .planner-cell {
+    background: #fff;
+    padding: 10px;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
   }
 
   .planner-thumb {
-    height: 60px;
-  }
-
-  input, select, button, textarea {
-    font-size: 1rem;
-    padding: 10px;
-    margin-bottom: 10px;
     width: 100%;
-    box-sizing: border-box;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-top: 5px;
+    cursor: pointer;
   }
-}
 
-<style>
-  /* Your existing styles... */
+  .planner-label {
+    text-align: center;
+    font-weight: bold;
+  }
 
-  /* Paste responsive styles below */
+  .side-add, .side-remove {
+    font-size: 1rem;
+    padding: 2px 6px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+  }
+
+  .side-add {
+    background-color: #eee;
+  }
+
+  .side-remove {
+    background-color: #fdd;
+    margin-left: 6px;
+  }
+
+  .side-wrapper {
+    display: flex;
+    align-items: center;
+    margin-top: 4px;
+  }
+
+  /* Tablet styles */
   @media (max-width: 768px) {
-    /* Tablet styles... */
+    .responsive-nav {
+      top: auto;
+      bottom: 0;
+      box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+    }
+
+    .planner-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .planner-thumb {
+      height: 80px;
+    }
+
+    .overlay {
+      margin: 10px;
+      padding: 10px;
+    }
+
+    input, select, button, textarea {
+      font-size: 1rem;
+      padding: 10px;
+      margin-bottom: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    #recipeDetailPage img,
+    #gallery img {
+      width: 100%;
+      height: auto;
+    }
   }
 
+  /* Phone styles */
   @media (max-width: 480px) {
-    /* Phone styles... */
+    .planner-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .planner-cell {
+      padding: 8px;
+    }
+
+    .side-wrapper {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .planner-thumb {
+      height: 60px;
+    }
   }
 </style>
 
 </head>
+<div class="responsive-nav">
+  <button onclick="showPage('plannerPage')">Planner</button>
+  <button onclick="showPage('groceryPage')">Grocery List</button>
+  <button onclick="showPage('galleryPage')">Gallery</button>
+</div>
+
 <body>
 <div id="recipeDetailPage" class="hidden">
   <h2>Recipe Details</h2>
@@ -162,9 +204,7 @@
 
   <div class="overlay">
     <div class="nav">
-      <button onclick="showPage('plannerPage')">Planner</button>
-      <button onclick="showPage('groceryPage')">Grocery List</button>
-      <button onclick="showPage('galleryPage')">Gallery</button>
+
       <button onclick="startNewRecipe()">Add Recipe</button>
       <button onclick="toggleCategoryDropdown()">Toggle Category Dropdown</button>
 <input id="recipeUrlInput" placeholder="Paste recipe URL" />
@@ -182,6 +222,12 @@
   <option value="Spring/Summer">Spring/Summer</option>
   <option value="Fall/Winter">Fall/Winter</option>
 </select>
+<div class="planner-controls">
+  <button onclick="startNewRecipe()">Add Recipe</button>
+  <button onclick="toggleCategoryDropdown()">Toggle Category Dropdown</button>
+  <input id="recipeUrlInput" placeholder="Paste recipe URL" />
+  <button onclick="fetchRecipe()">Import Recipe</button>
+</div>
 
       <label>Week:</label>
       <select id="weekSelect" onchange="renderPlanner()">
