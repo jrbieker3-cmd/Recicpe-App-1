@@ -5,7 +5,6 @@
   <meta charset="UTF-8" />
   <title>Recipe Planner App</title>
   <style>
-<style>
   /* Base styles */
   body {
     font-family: sans-serif;
@@ -156,6 +155,32 @@
       height: auto;
     }
   }
+.planner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  flex-wrap: nowrap;
+  gap: 20px;
+}
+
+.planner-title {
+  flex: 1;
+}
+
+.planner-title h2 {
+  margin: 0;
+  font-size: 1.8rem;
+  text-align: left;
+}
+
+.planner-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 
   /* Phone styles */
   @media (max-width: 480px) {
@@ -175,17 +200,43 @@
     .planner-thumb {
       height: 60px;
     }
+.planner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 10px 20px;
+  gap: 10px;
+}
+
+.planner-title h2 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.planner-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.planner-controls input {
+  padding: 8px;
+  font-size: 1rem;
+}
+
   }
 </style>
 
-</head>
+
+<body>
 <div class="responsive-nav">
   <button onclick="showPage('plannerPage')">Planner</button>
   <button onclick="showPage('groceryPage')">Grocery List</button>
   <button onclick="showPage('galleryPage')">Gallery</button>
 </div>
 
-<body>
 <div id="recipeDetailPage" class="hidden">
   <h2>Recipe Details</h2>
   <div style="display: flex; gap: 20px;">
@@ -205,29 +256,28 @@
   <div class="overlay">
     <div class="nav">
 
-      <button onclick="startNewRecipe()">Add Recipe</button>
-      <button onclick="toggleCategoryDropdown()">Toggle Category Dropdown</button>
-<input id="recipeUrlInput" placeholder="Paste recipe URL" />
-<button onclick="fetchRecipe()">Import Recipe</button>
-
 
 
 
     </div>
+<div id="plannerPage">
+<div class="planner-header">
+  <div class="planner-title">
+    <h2>Meal Planner</h2>
+  </div>
+  <div class="planner-controls">
+    <button onclick="startNewRecipe()">Add Recipe</button>
+    <input id="recipeUrlInput" placeholder="Paste recipe URL" />
+    <button onclick="fetchRecipe()">Import Recipe</button>
+  </div>
+</div>
 
-    <div id="plannerPage">
-      <h2>Meal Planner</h2>
       <label>Season:</label>
 <select id="seasonSelect" onchange="renderPlanner()">
   <option value="Spring/Summer">Spring/Summer</option>
   <option value="Fall/Winter">Fall/Winter</option>
 </select>
-<div class="planner-controls">
-  <button onclick="startNewRecipe()">Add Recipe</button>
-  <button onclick="toggleCategoryDropdown()">Toggle Category Dropdown</button>
-  <input id="recipeUrlInput" placeholder="Paste recipe URL" />
-  <button onclick="fetchRecipe()">Import Recipe</button>
-</div>
+
 
       <label>Week:</label>
       <select id="weekSelect" onchange="renderPlanner()">
@@ -250,6 +300,7 @@
       <h2>Grocery List</h2>
       <button onclick="generateGroceryList()">Generate Grocery List from Selected Week</button>
       <button onclick="clearGroceryList()">Clear List</button>
+<button onclick="toggleCategoryDropdown()">Toggle Category Dropdown</button>
       <ul id="groceryList"></ul>
     </div>
 
@@ -397,7 +448,7 @@ const categoryMap = {
   "smoothie": "Other",
   "frozen": "Other"
 };
-let showCategoryDropdown = true;
+let showCategoryDropdown = false;
 
 let customCategoryMap = JSON.parse(localStorage.getItem("customCategoryMap") || "{}");
 
