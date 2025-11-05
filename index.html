@@ -353,48 +353,22 @@ button {
   justify-content: center;
   padding: 20px;
 }
-/* === Recipe Detail Page Styling === */
-#recipeDetailPage {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px;
-}
+<div class="recipe-detail-layout">
+  <div class="recipe-left">
+    <h3>Ingredients</h3>
+    <ul id="ingredientChecklist"></ul>
 
-#recipeDetailPage h2,
-#recipeDetailPage h3 {
-  text-align: center;
-}
+    <h3>Instructions</h3>
+    <ol id="instructionList"></ol>
 
-#recipeDetailHeader {
-  font-size: 1.6rem;
-  margin-bottom: 10px;
-}
+    <h3>Notes</h3>
+    <ol id="notesList"></ol>
+  </div>
 
-#recipeNameDisplay {
-  text-align: center;
-  font-weight: 400;
-  margin-bottom: 16px;
-}
-
-/* Flex container for image + ingredients */
-.recipe-detail-main {
-  display: flex;
-  gap: 20px;
-  align-items: flex-start;
-  flex-wrap: wrap; /* helps on tablets */
-}
-
-#ingredientChecklist {
-  flex: 1;
-  list-style: none;
-  padding: 0;
-}
-
-#ingredientChecklist li {
-  margin-bottom: 8px;
-}
-
-#d
+  <div class="recipe-right">
+    <img id="detailImage" alt="Recipe Image" />
+  </div>
+</div>
 
 
 </style>
