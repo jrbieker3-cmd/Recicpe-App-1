@@ -353,7 +353,7 @@ button {
   justify-content: center;
   padding: 20px;
 }
-<div class="recipe-detail-layout">
+<div class="recipe-detail-container">
   <div class="recipe-left">
     <h3>Ingredients</h3>
     <ul id="ingredientChecklist"></ul>
@@ -369,6 +369,77 @@ button {
     <img id="detailImage" alt="Recipe Image" />
   </div>
 </div>
+/* --- Responsive Recipe Detail Layout --- */
+.recipe-detail-container {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 30px;
+  align-items: start;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.recipe-left {
+  overflow: hidden;
+}
+
+.recipe-right {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.recipe-right img {
+  width: 100%;
+  max-width: 320px;
+  border-radius: 12px;
+  height: auto;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Ingredients, instructions, notes spacing */
+#ingredientChecklist,
+#instructionList,
+#notesList {
+  margin: 0 0 20px 0;
+  padding-left: 20px;
+  line-height: 1.6;
+}
+
+#ingredientChecklist {
+  list-style: none;
+  padding-left: 0;
+}
+
+#ingredientChecklist li {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* --- Mobile View --- */
+@media (max-width: 768px) {
+  .recipe-detail-container {
+    grid-template-columns: 1fr; /* stack vertically */
+    gap: 16px;
+  }
+
+  .recipe-right img {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  #ingredientChecklist,
+  #instructionList,
+  #notesList {
+    padding-left: 0;
+  }
+}
+
 
 
 </style>
