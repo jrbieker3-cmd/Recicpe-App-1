@@ -440,6 +440,70 @@ button {
   }
 }
 
+/* === Responsive Weekly Planner Grid === */
+.planner-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 20px;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.dayBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dayLabel {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  background-color: #fafafa;
+  border-radius: 6px;
+  padding: 4px 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.dayCard {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 12px;
+  width: 100%;
+  min-height: 160px;
+  box-sizing: border-box;
+}
+
+/* --- Tablet view (4 columns) --- */
+@media (max-width: 1024px) {
+  .planner-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* --- Mobile view (1 column, stacked) --- */
+@media (max-width: 768px) {
+  .planner-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .dayBlock {
+    align-items: stretch;
+  }
+
+  .dayLabel {
+    text-align: left;
+    margin-bottom: 6px;
+    padding-left: 8px;
+  }
+
+  .dayCard {
+    min-height: 160px;
+  }
+}
 
 
 </style>
@@ -501,38 +565,106 @@ button {
 </div>
 
 <div id="plannerPage">
-<div class="planner-header">
-  <div class="planner-title">
-    <h2>Meal Planner</h2>
+  <div class="planner-header">
+    <div class="planner-title">
+      <h2>Meal Planner</h2>
+    </div>
+    <div class="planner-controls">
+      <button onclick="startNewRecipe()">Add Recipe</button>
+    </div>
   </div>
-  <div class="planner-controls">
-    <button onclick="startNewRecipe()">Add Recipe</button>
+
+  <label>Season:</label>
+  <select id="seasonSelect" onchange="renderPlanner()">
+    <option value="Spring/Summer">Spring/Summer</option>
+    <option value="Fall/Winter">Fall/Winter</option>
+  </select>
+
+  <label>Week:</label>
+  <select id="weekSelect" onchange="renderPlanner()">
+    <option value="1">Week 1</option>
+    <option value="2">Week 2</option>
+    <option value="3">Week 3</option>
+    <option value="4">Week 4</option>
+    <option value="5">Custom</option>
+  </select>
+
+  <label>View Mode:</label>
+  <select id="plannerMode" onchange="renderPlanner()">
+    <option value="week">Week View</option>
+    <option value="month">Month View</option>
+  </select>
+
+  <!-- ✅ Unified grid for day names + cards -->
+  <div id="plannerGrid" class="planner-grid">
+    <div class="dayBlock">
+      <div class="dayLabel">Sunday</div>
+      <div class="dayCard" id="W1D1"></div>
+    </div>
+
+    <div class="dayBlock">
+      <div class="dayLabel">Monday</div>
+      <div class="dayCard" id="W1D2"></div>
+    </div>
+
+    <div class="dayBlock">
+      <div class="dayLabel">Tuesday</div>
+      <div class="dayCard" id="W1D3"></div>
+    </div>
+
+    <div class="dayBlock">
+      <div class="dayLabel">Wednesday</div>
+      <div class="dayCard" id="W1D4"></div>
+    </div>
+
+    <div class="dayBlock">
+      <div class="dayLabel">Thursday</div>
+      <div class="dayCard" id="W1D5"></div>
+    </div>
+
+    <div class="dayBlock">
+      <div class="dayLabel">Friday</div>
+      <div class="dayCard" id="W1D6"></div>
+    </div>
+
+    <div class="dayBlock">
+      <div class="dayLabel">Saturday</div>
+      <div class="dayCard" id="W1D7"></div>
+    </div>
   </div>
 </div>
 
-      <label>Season:</label>
-<select id="seasonSelect" onchange="renderPlanner()">
-  <option value="Spring/Summer">Spring/Summer</option>
-  <option value="Fall/Winter">Fall/Winter</option>
-</select>
+<div id="plannerGrid" class="planner-grid">
+  <div class="dayBlock">
+    <div class="dayLabel">Sunday</div>
+    <div class="dayCard" id="W1D1"></div>
+  </div>
+  <div class="dayBlock">
+    <div class="dayLabel">Monday</div>
+    <div class="dayCard" id="W1D2"></div>
+  </div>
+  <div class="dayBlock">
+    <div class="dayLabel">Tuesday</div>
+    <div class="dayCard" id="W1D3"></div>
+  </div>
+  <div class="dayBlock">
+    <div class="dayLabel">Wednesday</div>
+    <div class="dayCard" id="W1D4"></div>
+  </div>
+  <div class="dayBlock">
+    <div class="dayLabel">Thursday</div>
+    <div class="dayCard" id="W1D5"></div>
+  </div>
+  <div class="dayBlock">
+    <div class="dayLabel">Friday</div>
+    <div class="dayCard" id="W1D6"></div>
+  </div>
+  <div class="dayBlock">
+    <div class="dayLabel">Saturday</div>
+    <div class="dayCard" id="W1D7"></div>
+  </div>
+</div>
 
-
-      <label>Week:</label>
-      <select id="weekSelect" onchange="renderPlanner()">
-        <option value="1">Week 1</option>
-        <option value="2">Week 2</option>
-        <option value="3">Week 3</option>
-        <option value="4">Week 4</option>
-        <option value= "5">Custom</option>
-      </select>
-      <label>View Mode:</label>
-      <select id="plannerMode" onchange="renderPlanner()">
-        <option value="week">Week View</option>
-        <option value="month">Month View</option>
-      </select>
-
-      <div id="plannerLabels" class="planner-grid"></div>
-      <div id="plannerPreview" class="planner-grid"></div>
     </div>
 
 <div id="groceryPage" class="hidden" style="padding: 20px; position: relative;">
