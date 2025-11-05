@@ -166,12 +166,6 @@
   gap: 20px;
 }
 
-.planner-label {
-  text-align: center;
-  font-weight: bold;
-}
-
-
 .planner-title {
   flex: 1;
 }
@@ -691,12 +685,27 @@ let showCategoryDropdown = false;
 let customCategoryMap = JSON.parse(localStorage.getItem("customCategoryMap") || "{}");
 
 function showPage(id) {
-  ["plannerPage", "groceryPage", "galleryPage", "recipeDetailPage", "addRecipePage", "exclusionPage", "conversionPage"].forEach(p => {
-    document.getElementById(p).classList.toggle("hidden", p !== id);
+  const pages = [
+    "plannerPage",
+    "groceryPage",
+    "galleryPage",
+    "recipeDetailPage",
+    "addRecipePage",
+    "exclusionPage",
+    "conversionPage"
+  ];
+
+  pages.forEach(p => {
+    const el = document.getElementById(p);
+    if (el) {
+      el.classList.toggle("hidden", p !== id);
+    }
   });
+
   if (id === "exclusionPage") renderExclusionList();
   if (id === "conversionPage") renderConversionTable();
 }
+
 
 
 
@@ -810,7 +819,12 @@ function showRecipeDetail(recipe) {
     notesList.appendChild(li);
   });
 const servingSizeEl = document.getElementById("servingSizeDisplay");
-servingSizeEl.textContent = `Serves: ${recipe.servingSize || "?"}`;
+if (servingSizeEl && recipe.servingSize !== undefined) {
+  servingSizeEl.textContent = `Serves: ${recipe.servingSize}`;
+} else if (servingSizeEl) {
+  servingSizeEl.textContent = `Serves: ?`;
+}
+
 
 }
 
@@ -948,7 +962,10 @@ function singularize(word) {
 
 function updatePlanner(dayId) {
   const main = document.querySelector(`#${dayId}-main`)?.value || "";
-  const selectedRecipe = recipes.find(r => r.name === main);
+  const selectedRecipe = recipes.find(r => 
+  r.name.trim().toLowerCase() === main.trim().toLowerCase()
+);
+
   const clearBtn = document.getElementById(`${dayId}-clearBtn`);
   if (clearBtn) {
   clearBtn.style.display = selectedRecipe ? "inline-block" : "none";
@@ -1040,11 +1057,25 @@ function handleImageClick(dayId) {
   const season = document.getElementById("seasonSelect").value;
   const seasonData = plannerSelections[season] || {};
   const main = seasonData[dayId]?.main;
-  const recipe = recipes.find(r => r.name === main);
-  if (!recipe) return;
+
+  if (!main) {
+    alert("No recipe is assigned to this day.");
+    return;
+  }
+
+  const recipe = recipes.find(r => 
+    r.name.trim().toLowerCase() === main.trim().toLowerCase()
+  );
+
+  if (!recipe) {
+    console.error("Recipe not found for:", main);
+    alert(`Recipe "${main}" not found in your recipe list.`);
+    return;
+  }
 
   showRecipeDetail(recipe);
 }
+
 
 
 
@@ -1820,11 +1851,6 @@ function addConversion() {
   document.getElementById("newFactor").value = "";
 }
 
-function deleteConversion(fromUnit) {
-  delete unitConversion[fromUnit];
-  localStorage.setItem("unitConversion", JSON.stringify(unitConversion));
-  renderConversionTable();
-}
 
 
 
