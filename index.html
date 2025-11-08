@@ -333,7 +333,6 @@ button:hover {
 }
 
 /* -------------------- Mobile Styles -------------------- */
-/* -------------------- Mobile Styles -------------------- */
 @media (max-width: 480px) {
   .planner-label {
     display: none;
@@ -383,16 +382,33 @@ button:hover {
     border-bottom: 1px solid #eee;
   }
 
-  #groceryList input,
-  #groceryList select {
+  #groceryList div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     width: 100%;
+    flex-wrap: wrap; /* ✅ allow wrapping on small screens */
+  }
+
+  #groceryList input[type="text"] {
+    flex: 1;
+    min-width: 160px;
     font-size: 1rem;
-    padding: 6px;
+    padding: 6px 0;
+    border: none;
+    background: transparent;
   }
 
   #groceryList input[type="checkbox"] {
     transform: scale(1.2);
-    margin-bottom: 6px;
+    margin: 0;
+  }
+
+  #groceryList select {
+    width: 100%;
+    font-size: 1rem;
+    padding: 6px;
+    margin-top: 6px;
   }
 }
 
@@ -1282,6 +1298,7 @@ function generateGroceryList() {
       const row = document.createElement("div");
       row.style.display = "flex";
       row.style.alignItems = "center";
+      row.style.flexWrap = "wrap"; // ✅ allow wrapping on mobile
       row.style.gap = "10px";
       row.style.width = "100%";
 
@@ -1304,6 +1321,7 @@ function generateGroceryList() {
       input.style.padding = "6px 0";
       input.style.margin = "0";
       input.style.flex = "1";
+      input.style.minWidth = "160px"; // ✅ prevent collapse on mobile
 
       row.appendChild(checkbox);
       row.appendChild(input);
@@ -1332,6 +1350,7 @@ function generateGroceryList() {
     });
   });
 }
+
 
 
 
