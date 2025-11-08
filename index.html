@@ -608,10 +608,18 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
-
+if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-  window.db = db; // ✅ Make Firestore globally accessible
+}
+
+const db = firebase.firestore();
+window.db = db;
+db.collection("recipes").get().then(snapshot => {
+  console.log("✅ Recipes loaded:", snapshot.docs.map(doc => doc.data()));
+}).catch(err => {
+  console.error("❌ Firestore error:", err);
+});
+
 
     // ✅ Initialize variables early to prevent ReferenceError
 let plannerSelections = {}; // ✅ Declare once globally
