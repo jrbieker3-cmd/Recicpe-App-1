@@ -362,6 +362,19 @@ button:hover {
     flex-direction: column;
     align-items: flex-start;
   }
+.mobile-day-label {
+  display: none;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+@media (max-width: 480px) {
+  .mobile-day-label {
+    display: block;
+  }
+}
+
 }
 </style>
 
@@ -859,29 +872,31 @@ function renderPlanner() {
     });
 
     days.forEach((day, index) => {
-      const dayId = `W${week}D${index + 1}`;
-      const cell = document.createElement("div");
-      cell.className = "planner-cell";
-      cell.innerHTML = `
-        <img id="${dayId}-img" class="planner-thumb" src="" alt="" onclick="handleImageClick('${dayId}')" />
-        <div style="display: flex; align-items: center; gap: 6px;">
-          <input list="recipeOptions-${dayId}" id="${dayId}-main" onchange="updatePlanner('${dayId}')" />
-          <datalist id="recipeOptions-${dayId}">
-            ${recipeOptions(season)}
-          </datalist>
-          <button onclick="clearRecipe('${dayId}')" id="${dayId}-clearBtn" style="display:none; padding: 2px 6px; font-size: 1rem; border: none; background-color: #fdd; border-radius: 50%; cursor: pointer;">×</button>
-        </div>
-        <div id="${dayId}-sides"></div>
-        <button onclick="addSide('${dayId}')" class="side-add-rect">+ Add Side</button>
-      `;
-      cellRow.appendChild(cell);
+  const dayId = `W${week}D${index + 1}`;
+  const cell = document.createElement("div");
+  cell.className = "planner-cell";
+  cell.innerHTML = `
+    <div class="mobile-day-label">${day}</div> <!-- ✅ Mobile label -->
+    <img id="${dayId}-img" class="planner-thumb" src="" alt="" onclick="handleImageClick('${dayId}')" />
+    <div style="display: flex; align-items: center; gap: 6px;">
+      <input list="recipeOptions-${dayId}" id="${dayId}-main" onchange="updatePlanner('${dayId}')" />
+      <datalist id="recipeOptions-${dayId}">
+        ${recipeOptions(season)}
+      </datalist>
+      <button onclick="clearRecipe('${dayId}')" id="${dayId}-clearBtn" style="display:none; padding: 2px 6px; font-size: 1rem; border: none; background-color: #fdd; border-radius: 50%; cursor: pointer;">×</button>
+    </div>
+    <div id="${dayId}-sides"></div>
+    <button onclick="addSide('${dayId}')" class="side-add-rect">+ Add Side</button>
+  `;
+  cellRow.appendChild(cell);
 
-      const imgEl = document.getElementById(`${dayId}-img`);
-      if (imgEl && (!plannerSelections[dayId] || !plannerSelections[dayId].main)) {
-        imgEl.src = fallbackImage;
-        imgEl.alt = "Add Recipe";
-      }
-    });
+  const imgEl = document.getElementById(`${dayId}-img`);
+  if (imgEl && (!plannerSelections[dayId] || !plannerSelections[dayId].main)) {
+    imgEl.src = fallbackImage;
+    imgEl.alt = "Add Recipe";
+  }
+});
+
   } else {
     labelRow.style.display = "none";
 
