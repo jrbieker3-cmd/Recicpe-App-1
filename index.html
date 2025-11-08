@@ -1,15 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Recipe App</title>
-<!-- ✅ Load Firebase libraries first -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-  };
-<style>
-
+</head>
 /* -------------------- Base Styles -------------------- */
 body {
   font-family: sans-serif;
@@ -417,7 +412,14 @@ button:hover {
 
 
 <body>
-<body>
+  <h1>Recipe Fetcher</h1>
+
+  <!-- 🔍 Input and button -->
+  <input id="recipeUrlInput" placeholder="Paste recipe URL here" />
+  <button id="fetchRecipeBtn">Fetch Recipe</button>
+
+  <!-- 🧠 Load your main.js as a module -->
+  <script type="module" src="./main.js"></script>
   <!-- ✅ Navigation -->
   <div class="responsive-nav">
     <button onclick="showPage('plannerPage')">Planner</button>
@@ -1955,3 +1957,4 @@ renderGallery();
 </html>
 
          
+
