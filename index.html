@@ -1,10 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta charset="UTF-8" />
-  <title>Recipe Planner App</title>
-  <style>
+  <title>Recipe App</title>
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+ <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<style>
+
 /* -------------------- Base Styles -------------------- */
 body {
   font-family: sans-serif;
@@ -362,279 +369,325 @@ button:hover {
     flex-direction: column;
     align-items: flex-start;
   }
-.mobile-day-label {
-  display: none;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 6px;
-}
 
-@media (max-width: 480px) {
   .mobile-day-label {
     display: block;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 6px;
   }
-}
-
 }
 </style>
 
 
 
 <body>
-<div class="responsive-nav">
-  <button onclick="showPage('plannerPage')">Planner</button>
-  <button onclick="showPage('groceryPage')">Grocery List</button>
-  <button onclick="showPage('galleryPage')">Gallery</button>
-<button onclick="showPage('conversionPage')">Conversions</button>
-
-<button onclick="showPage('exclusionPage')">Exclusions</button>
-
-</div>
-
-<div id="recipeDetailPage" class="hidden" style="padding: 60px;">
-  <!-- Header -->
-<h2 id="recipeDetailHeader" style="text-align: center;"></h2>
-
-
- <!-- Button row -->
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px;">
-  <button onclick="showPage('plannerPage')" style="font-size: 1rem;">← Back to Planner</button>
-
-  <div style="display: flex; gap: 10px;">
-    <button onclick="editRecipe()" style="display: flex; align-items: center; gap: 6px; font-size: 1rem;">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
-        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207z"/>
-      </svg>
-      Edit
-    </button>
-
-    <button onclick="confirmDeleteRecipe()" style="display: flex; align-items: center; gap: 6px; font-size: 1rem;">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-        <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-      </svg>
-      Delete
-    </button>
-  </div>
-</div>
-
-  <!-- Recipe name -->
-<h3 id="recipeNameDisplay" style="text-align: center; margin: 0 0 20px 0; font-weight: normal;"></h3>
-
-
-  <!-- Main content -->
-  <div style="display: flex; gap: 20px;">
-    <ul id="ingredientChecklist" style="flex: 1;"></ul>
-    <img id="detailImage" style="width: 300px; border-radius: 8px;" />
+<body>
+  <!-- ✅ Navigation -->
+  <div class="responsive-nav">
+    <button onclick="showPage('plannerPage')">Planner</button>
+    <button onclick="showPage('groceryPage')">Grocery List</button>
+    <button onclick="showPage('galleryPage')">Gallery</button>
+    <button onclick="showPage('conversionPage')">Conversions</button>
+    <button onclick="showPage('exclusionPage')">Exclusions</button>
   </div>
 
-  <h3>Instructions</h3>
-  <ol id="instructionList"></ol>
+  <!-- ✅ Recipe Detail Page -->
+  <div id="recipeDetailPage" class="hidden" style="padding: 60px;">
+    <h2 id="recipeDetailHeader" style="text-align: center;"></h2>
+    <div id="servingSizeDisplay" style="margin-top: 10px; font-style: italic;"></div>
 
-  <h3>Notes</h3>
-  <ol id="notesList"></ol>
-</div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px;">
+      <button onclick="showPage('plannerPage')" style="font-size: 1rem;">← Back to Planner</button>
+      <div style="display: flex; gap: 10px;">
+        <button onclick="editRecipe()" style="display: flex; align-items: center; gap: 6px; font-size: 1rem;">Edit</button>
+        <button onclick="confirmDeleteRecipe()" style="display: flex; align-items: center; gap: 6px; font-size: 1rem;">Delete</button>
+      </div>
+    </div>
 
-<div id="plannerPage">
-<div class="planner-header">
-  <div class="planner-title">
-    <h2>Meal Planner</h2>
+    <h3 id="recipeNameDisplay" style="text-align: center; margin: 0 0 20px 0; font-weight: normal;"></h3>
+
+    <div style="display: flex; gap: 20px;">
+      <ul id="ingredientChecklist" style="flex: 1;"></ul>
+      <img id="detailImage" style="width: 300px; border-radius: 8px;" />
+    </div>
+
+    <h3>Instructions</h3>
+    <ol id="instructionList"></ol>
+
+    <h3>Notes</h3>
+    <ol id="notesList"></ol>
   </div>
-  <div class="planner-controls">
-    <button onclick="startNewRecipe()">Add Recipe</button>
+
+  <!-- ✅ Planner Page -->
+  <div id="plannerPage">
+    <div class="planner-header">
+      <div class="planner-title"><h2>Meal Planner</h2></div>
+      <div class="planner-controls">
+        <button onclick="startNewRecipe()">Add Recipe</button>
+      </div>
+    </div>
+
+    <label>Season:</label>
+    <select id="seasonSelect" onchange="renderPlanner()">
+      <option value="Spring/Summer">Spring/Summer</option>
+      <option value="Fall/Winter">Fall/Winter</option>
+    </select>
+
+    <label>Week:</label>
+    <select id="weekSelect" onchange="renderPlanner()">
+      <option value="1">Week 1</option>
+      <option value="2">Week 2</option>
+      <option value="3">Week 3</option>
+      <option value="4">Week 4</option>
+      <option value="5">Custom</option>
+    </select>
+
+    <label>View Mode:</label>
+    <select id="plannerMode" onchange="renderPlanner()">
+      <option value="week">Week View</option>
+      <option value="month">Month View</option>
+    </select>
+
+    <div id="plannerLabels" class="planner-grid"></div>
+    <div id="plannerPreview" class="planner-grid"></div>
   </div>
-</div>
 
-      <label>Season:</label>
-<select id="seasonSelect" onchange="renderPlanner()">
-  <option value="Spring/Summer">Spring/Summer</option>
-  <option value="Fall/Winter">Fall/Winter</option>
-</select>
+  <!-- ✅ Grocery Page -->
+  <div id="groceryPage" class="hidden" style="padding: 20px; position: relative;">
+    <h2>Grocery List</h2>
 
+    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+      <button onclick="generateGroceryList()">Generate Grocery List</button>
+      <button onclick="clearGroceryList()">Clear List</button>
+      <button onclick="toggleExclusionSidebar()">Toggle Exclusion List</button>
+      <button onclick="toggleCategoryDropdown()">Toggle Category Dropdown</button>
+    </div>
 
-      <label>Week:</label>
-      <select id="weekSelect" onchange="renderPlanner()">
-        <option value="1">Week 1</option>
-        <option value="2">Week 2</option>
-        <option value="3">Week 3</option>
-        <option value="4">Week 4</option>
-        <option value= "5">Custom</option>
+    <ul id="groceryList"></ul>
+
+    <!-- Exclusion Sidebar -->
+    <div id="exclusionSidebar"
+         style="position: absolute; top: 60px; right: 0; width: 280px; background: #fff;
+                box-shadow: -2px 0 6px rgba(0,0,0,0.1); padding: 16px;
+                border-left: 1px solid #ccc; display: none; z-index: 100;">
+      <h3 style="margin-top: 0;">Do Not Auto-Add</h3>
+      <ul id="exclusionListSidebar"></ul>
+      <input id="newExclusionSidebarInput" placeholder="Add item to exclude" />
+      <button onclick="addToExclusionSidebar()">Add</button>
+    </div>
+  </div>
+
+  <!-- ✅ Gallery Page -->
+  <div id="galleryPage" class="hidden" style="padding: 20px;">
+    <h2>Recipe Gallery</h2>
+
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+      <div style="position: relative; width: 100%; max-width: 300px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
+             class="bi bi-search" viewBox="0 0 16 16"
+             style="position: absolute; top: 50%; left: 10px; transform: translateY(-50%);
+                    pointer-events: none; color: #888;">
+          <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85
+                   a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12
+                   6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search recipes..."
+               oninput="renderGallery()"
+               style="width: 100%; padding: 8px 8px 8px 36px; border: 1px solid #ccc;
+                      border-radius: 6px; font-size: 1rem;" />
+      </div>
+    </div>
+
+    <div id="gallery"></div>
+  </div>
+
+  <!-- ✅ Add Recipe Page -->
+  <div id="addRecipePage" class="hidden" style="padding: 20px;">
+    <h3>Import Recipe from Website</h3>
+    <input id="recipeUrlInput" placeholder="Paste recipe URL here" style="width:80%;" />
+    <button onclick="fetchRecipe()">Import Recipe</button>
+
+    <h2>Add New Recipe</h2>
+    <label>Name: <input id="newRecipeName" /></label><br>
+    <label>Description: <input id="newRecipeDesc" /></label><br>
+    <label>Cook Time (min): <input id="newRecipeTime" type="number" /></label><br>
+    <label>Image URL (optional): <input id="newRecipeImage" /></label><br>
+    <label>Serving Size: <input id="newRecipeServings" type="number" min="1" step="1" /></label><br>
+
+    <label>Season:
+      <select id="newRecipeSeason">
+        <option value="Spring/Summer">Spring/Summer</option>
+        <option value="Fall/Winter">Fall/Winter</option>
+        <option value="Year-Round">Year-Round</option>
       </select>
-      <label>View Mode:</label>
-      <select id="plannerMode" onchange="renderPlanner()">
-        <option value="week">Week View</option>
-        <option value="month">Month View</option>
-      </select>
+    </label><br>
 
-      <div id="plannerLabels" class="planner-grid"></div>
-      <div id="plannerPreview" class="planner-grid"></div>
-    </div>
+    <h3>Ingredients</h3>
+    <div id="ingredientList"></div>
+    <button onclick="addIngredientRow()">+ Add Ingredient</button>
 
-<div id="groceryPage" class="hidden" style="padding: 20px; position: relative;">
-  <h2>Grocery List</h2>
+    <h3>Instructions</h3>
+    <textarea id="newRecipeInstructions" rows="4" cols="50" placeholder="One step per line"></textarea>
 
-  <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
-    <button onclick="generateGroceryList()">Generate Grocery List from Selected Week</button>
-    <button onclick="clearGroceryList()">Clear List</button>
-    <button onclick="toggleExclusionSidebar()">Toggle Exclusion List</button>
-    <button onclick="toggleCategoryDropdown()">Toggle Category Dropdown</button>
+    <h3>Notes</h3>
+    <textarea id="newRecipeNotes" rows="4" cols="50" placeholder="One note per line"></textarea>
+
+    <br><br>
+    <button onclick="saveNewRecipe()">Save Recipe</button>
+    <button onclick="showPage('plannerPage')">← Back to Planner</button>
   </div>
 
-  <ul id="groceryList"></ul>
+  <!-- ✅ Conversion Page -->
+  <div id="conversionPage" class="hidden" style="padding: 20px;">
+    <h2>Edit Unit Conversions</h2>
+    <table style="width:100%; border-collapse: collapse; margin-bottom: 16px;">
+      <thead>
+        <tr>
+          <th style="text-align:left;">From Unit</th>
+          <th style="text-align:left;">To Unit</th>
+          <th style="text-align:left;">Factor</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="conversionTableBody"></tbody>
+    </table>
 
-  <!-- Exclusion Sidebar -->
-  <div id="exclusionSidebar" style="position: absolute; top: 60px; right: 0; width: 280px; background: #fff; box-shadow: -2px 0 6px rgba(0,0,0,0.1); padding: 16px; border-left: 1px solid #ccc; display: none; z-index: 100;">
-    <h3 style="margin-top: 0;">Do Not Auto-Add</h3>
-    <ul id="exclusionListSidebar"></ul>
-    <input id="newExclusionSidebarInput" placeholder="Add item to exclude" />
-    <button onclick="addToExclusionSidebar()">Add</button>
-  </div>
-</div>
-
-<div id="galleryPage" class="hidden" style="padding: 20px;">
-  <h2>Recipe Gallery</h2>
-
-  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
-    <div style="position: relative; width: 100%; max-width: 300px;">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
-           class="bi bi-search" viewBox="0 0 16 16"
-           style="position: absolute; top: 50%; left: 10px; transform: translateY(-50%); pointer-events: none; color: #888;">
-        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-      </svg>
-      <input type="text" id="searchInput" placeholder="Search recipes..."
-             oninput="renderGallery()"
-             style="width: 100%; padding: 8px 8px 8px 36px; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem;" />
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <input id="newFromUnit" placeholder="From (e.g. tbsp)" />
+      <input id="newToUnit" placeholder="To (e.g. tsp)" />
+      <input id="newFactor" type="number" step="0.01" placeholder="Factor (e.g. 3)" />
+      <button onclick="addConversion()">Add Conversion</button>
     </div>
   </div>
-
-  <div id="gallery"></div>
-</div>
-
-
-      <div id="gallery"></div>
-    </div>
-  </div>
-<div id="addRecipePage" class="hidden">
-   <h3>Import Recipe from Website</h3>
-   <input id="recipeUrlInput" placeholder="Paste recipe URL here" style="width:80%;" />
-<button onclick="fetchRecipe()">Import Recipe</button>
-
-
-  <h2>Add New Recipe</h2>
-  <label>Name: <input id="newRecipeName" /></label><br>
-  <label>Description: <input id="newRecipeDesc" /></label><br>
-  <label>Cook Time (min): <input id="newRecipeTime" type="number" /></label><br>
-<label>Image URL (optional): <input id="newRecipeImage" /></label><br>
-<label>Serving Size: <input id="newRecipeServings" type="number" min="1" step="1" /></label><br>
-
-
-  <label>Season:
-<select id="newRecipeSeason">
-  <option value="Spring/Summer">Spring/Summer</option>
-  <option value="Fall/Winter">Fall/Winter</option>
-  <option value="Year-Round">Year-Round</option>
-</select>
-
-  </label><br>
-
-  <h3>Ingredients</h3>
-
-<div id="conversionPage" class="hidden" style="padding: 20px;">
-  <h2>Edit Unit Conversions</h2>
-  <table style="width:100%; border-collapse: collapse; margin-bottom: 16px;">
-    <thead>
-      <tr>
-        <th style="text-align:left;">From Unit</th>
-        <th style="text-align:left;">To Unit</th>
-        <th style="text-align:left;">Factor</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody id="conversionTableBody"></tbody>
-  </table>
-
-  <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-    <input id="newFromUnit" placeholder="From (e.g. tbsp)" />
-    <input id="newToUnit" placeholder="To (e.g. tsp)" />
-    <input id="newFactor" type="number" step="0.01" placeholder="Factor (e.g. 3)" />
-    <button onclick="addConversion()">Add Conversion</button>
-  </div>
-</div>
-
-  <div id="ingredientList"></div>
-  <button onclick="addIngredientRow()">+ Add Ingredient</button>
-
-  <h3>Instructions</h3>
-  <textarea id="newRecipeInstructions" rows="4" cols="50" placeholder="One step per line"></textarea>
-
-  <h3>Notes</h3>
-  <textarea id="newRecipeNotes" rows="4" cols="50" placeholder="One note per line"></textarea>
-
-  <br><br>
-  <button onclick="saveNewRecipe()">Save Recipe</button>
-  <button onclick="showPage('plannerPage')">← Back to Planner</button>
-</div>
-
 
 <script>
-let recipes = JSON.parse(localStorage.getItem("recipes") || "[]");
+    // ✅ Replace these values with your Firebase project config
+const firebaseConfig = {
+  apiKey: "AIzaSyCRKIl3a3zWRT5V2Ds3gCzG8Mjk42rE1lc",
+  authDomain: "recipe-app-4549f.firebaseapp.com",
+  projectId: "recipe-app-4549f",
+  storageBucket: "recipe-app-4549f.firebasestorage.app",
+  messagingSenderId: "931787521865",
+  appId: "1:931787521865:web:bcf4dc545abf509efda498",
+  measurementId: "G-DSYGZM893N"
+};
 
-if (recipes.length === 0) {
-  recipes = [
-    {
-      name: "Spaghetti Bolognese",
-      image: "https://sagourmetfoodco.com.au/wp-content/uploads/2021/05/SAGFC-004-Spaghetti-Bolognese-700x519.jpg",
-      description: "Rich tomato meat sauce over pasta",
-      cookTime: 45,
-      season: "Spring/Summer",
-      ingredients: [
-        { name: "Pasta", qty: 1, unit: "box" },
-        { name: "Tomato Sauce", qty: 1, unit: "jar" },
-        { name: "Ground Beef", qty: 500, unit: "g" },
-        { name: "Onion", qty: 1, unit: "pcs" }
-      ],
-      instructions: [
-        "Boil pasta until al dente.",
-        "Cook ground beef until browned.",
-        "Add tomato sauce and simmer.",
-        "Combine with pasta and serve."
-      ],
-      notes: [
-        "Use fresh herbs for better flavor.",
-        "Can substitute ground turkey."
-      ]
-    },
-    {
-      name: "Lemon Herb Chicken",
-      image: "https://www.eatyourselfskinny.com/wp-content/uploads/2024/04/lemon-chicken-2-scaled.jpg",
-      description: "Tender chicken with zesty lemon and herbs",
-      cookTime: 60,
-      season: "Spring/Summer",
-      ingredients: [
-        { name: "Chicken Thighs", qty: 4, unit: "pcs" },
-        { name: "Lemon", qty: 2, unit: "pcs" },
-        { name: "Rosemary", qty: 1, unit: "tbsp" },
-        { name: "Olive Oil", qty: 1, unit: "tbsp" }
-      ],
-      instructions: [
-        "Marinate chicken with lemon and rosemary.",
-        "Sear chicken until golden.",
-        "Bake until cooked through.",
-        "Serve with pan juices."
-      ],
-      notes: [
-        "Use fresh herbs for better flavor.",
-        "Can substitute chicken breasts."
-      ]
-    }
-  ];
-  localStorage.setItem("recipes", JSON.stringify(recipes));
-}
+    // ✅ Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // ✅ Make it global so all your functions can use it
+    window.db = db;
+
+    // ✅ Initialize variables early to prevent ReferenceError
+let plannerSelections = {}; // ✅ Declare once globally
+
+db.collection("plannerSelections").doc("default").get().then(doc => {
+  if (doc.exists) {
+    plannerSelections = doc.data();
+    renderPlanner(); // ✅ Safe to call after loading
+  } else {
+    plannerSelections = {
+      "Spring/Summer": {},
+      "Fall/Winter": {},
+      "Year-Round": {}
+    };
+    db.collection("plannerSelections").doc("default").set(plannerSelections);
+  }
+}).catch(error => {
+  console.error("Error loading plannerSelections:", error);
+});
+
+    console.log("Firebase initialized successfully");
+
+let recipes = [];
+
+db.collection("recipes").get().then(snapshot => {
+  recipes = snapshot.docs.map(doc => doc.data());
+
+  if (recipes.length === 0) {
+    recipes = [
+      {
+        name: "Spaghetti Bolognese",
+        image: "https://sagourmetfoodco.com.au/wp-content/uploads/2021/05/SAGFC-004-Spaghetti-Bolognese-700x519.jpg",
+        description: "Rich tomato meat sauce over pasta",
+        cookTime: 45,
+        season: "Spring/Summer",
+        ingredients: [
+          { name: "Pasta", qty: 1, unit: "box" },
+          { name: "Tomato Sauce", qty: 1, unit: "jar" },
+          { name: "Ground Beef", qty: 500, unit: "g" },
+          { name: "Onion", qty: 1, unit: "pcs" }
+        ],
+        instructions: [
+          "Boil pasta until al dente.",
+          "Cook ground beef until browned.",
+          "Add tomato sauce and simmer.",
+          "Combine with pasta and serve."
+        ],
+        notes: [
+          "Use fresh herbs for better flavor.",
+          "Can substitute ground turkey."
+        ]
+      },
+      {
+        name: "Lemon Herb Chicken",
+        image: "https://www.eatyourselfskinny.com/wp-content/uploads/2024/04/lemon-chicken-2-scaled.jpg",
+        description: "Tender chicken with zesty lemon and herbs",
+        cookTime: 60,
+        season: "Spring/Summer",
+        ingredients: [
+          { name: "Chicken Thighs", qty: 4, unit: "pcs" },
+          { name: "Lemon", qty: 2, unit: "pcs" },
+          { name: "Rosemary", qty: 1, unit: "tbsp" },
+          { name: "Olive Oil", qty: 1, unit: "tbsp" }
+        ],
+        instructions: [
+          "Marinate chicken with lemon and rosemary.",
+          "Sear chicken until golden.",
+          "Bake until cooked through.",
+          "Serve with pan juices."
+        ],
+        notes: [
+          "Use fresh herbs for better flavor.",
+          "Can substitute chicken breasts."
+        ]
+      }
+    ];
+
+    // Save fallback recipes to Firestore
+    recipes.forEach(recipe => {
+      db.collection("recipes").doc(recipe.name).set(recipe);
+    });
+  }
+
+  renderPlanner(); // ✅ Now safe to call after recipes are loaded or seeded
+}).catch(error => {
+  console.error("Error loading recipes:", error);
+});
+
 
 const fallbackImage = "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
 
+db.collection("plannerSelections").doc("default").get().then(doc => {
+  if (doc.exists) {
+    plannerSelections = doc.data();
+    renderPlanner(); // or whatever uses plannerSelections
+  } else {
+    plannerSelections = {
+      "Spring/Summer": {},
+      "Fall/Winter": {},
+      "Year-Round": {}
+    };
+    db.collection("plannerSelections").doc("default").set(plannerSelections);
+  }
+}).catch(error => {
+  console.error("Error loading plannerSelections:", error);
+});
 
-let plannerSelections = JSON.parse(localStorage.getItem("plannerSelections") || "{}");
+
+
 // Structure: { "Spring/Summer": { W1D1: {...} }, "Fall/Winter": { W1D1: {...} }, "Year-Round": { W1D1: {...} } }
 let groceryList = [];
 const categoryMap = {
@@ -678,33 +731,47 @@ const categoryMap = {
   "smoothie": "Other",
   "frozen": "Other"
 };
-let unitConversion = JSON.parse(localStorage.getItem("unitConversion") || "{}");
+let unitConversion = {};
 
-if (Object.keys(unitConversion).length === 0) {
-  unitConversion = {
-    tsp: { to: "tsp", factor: 1 },
-    tbsp: { to: "tsp", factor: 3 },
-    cup: { to: "tsp", factor: 48 },
-    oz: { to: "tsp", factor: 6 },
-    ml: { to: "tsp", factor: 0.202884 },
-    l: { to: "tsp", factor: 202.884 }
-  };
-  localStorage.setItem("unitConversion", JSON.stringify(unitConversion));
-}
+db.collection("settings").doc("unitConversion").get().then(doc => {
+  if (doc.exists) {
+    unitConversion = doc.data();
+  } else {
+    unitConversion = {
+      tsp: { to: "tsp", factor: 1 },
+      tbsp: { to: "tsp", factor: 3 },
+      cup: { to: "tsp", factor: 48 },
+      oz: { to: "tsp", factor: 6 },
+      ml: { to: "tsp", factor: 0.202884 },
+      l: { to: "tsp", factor: 202.884 }
+    };
+    db.collection("settings").doc("unitConversion").set(unitConversion);
+  }
+});
+
 
   // Add more as needed
-let exclusionList = JSON.parse(localStorage.getItem("exclusionList") || "[]");
+let exclusionList = [];
 
-// Example default exclusions
-if (exclusionList.length === 0) {
-  exclusionList = ["Milk", "Egg", "Salt", "Pepper", "Paprika", "Cumin","Trash"];
-  localStorage.setItem("exclusionList", JSON.stringify(exclusionList));
-}
-
+db.collection("settings").doc("exclusionList").get().then(doc => {
+  if (doc.exists) {
+    exclusionList = doc.data().items || [];
+  } else {
+    exclusionList = ["Milk", "Egg", "Salt", "Pepper", "Paprika", "Cumin", "Trash"];
+    db.collection("settings").doc("exclusionList").set({ items: exclusionList });
+  }
+});
 
 let showCategoryDropdown = false;
 
-let customCategoryMap = JSON.parse(localStorage.getItem("customCategoryMap") || "{}");
+let customCategoryMap = {};
+
+db.collection("settings").doc("customCategoryMap").get().then(doc => {
+  if (doc.exists) {
+    customCategoryMap = doc.data();
+  }
+});
+
 
 function showPage(id) {
   const pages = [
@@ -782,6 +849,9 @@ linkBtn.onclick = () => {
 function showRecipeDetail(recipe) {
   showPage("recipeDetailPage");
 
+  // Scroll to top of detail view for better UX
+  document.getElementById("recipeDetailPage").scrollIntoView({ behavior: "smooth" });
+
   // Set image
   const imgEl = document.getElementById("detailImage");
   imgEl.src = recipe.image;
@@ -810,7 +880,7 @@ function showRecipeDetail(recipe) {
     checkbox.style.transform = "scale(1.4)";
 
     const span = document.createElement("span");
-    span.textContent = `${qty} ${unit} ${name}`;
+    span.textContent = `${qty} ${unit ? unit + " " : ""}${name}`; // ✅ cleaner formatting
 
     checkbox.addEventListener("change", () => {
       span.style.textDecoration = checkbox.checked ? "line-through" : "none";
@@ -826,28 +896,40 @@ function showRecipeDetail(recipe) {
   // Render instructions
   const instructionList = document.getElementById("instructionList");
   instructionList.innerHTML = "";
-  recipe.instructions.forEach(step => {
+  if (recipe.instructions.length > 0) {
+    recipe.instructions.forEach(step => {
+      const li = document.createElement("li");
+      li.textContent = step;
+      instructionList.appendChild(li);
+    });
+  } else {
     const li = document.createElement("li");
-    li.textContent = step;
+    li.textContent = "No instructions provided.";
     instructionList.appendChild(li);
-  });
+  }
 
   // Render notes
   const notesList = document.getElementById("notesList");
   notesList.innerHTML = "";
-  recipe.notes.forEach(note => {
+  if (recipe.notes.length > 0) {
+    recipe.notes.forEach(note => {
+      const li = document.createElement("li");
+      li.textContent = note;
+      notesList.appendChild(li);
+    });
+  } else {
     const li = document.createElement("li");
-    li.textContent = note;
+    li.textContent = "No notes provided.";
     notesList.appendChild(li);
-  });
-const servingSizeEl = document.getElementById("servingSizeDisplay");
-if (servingSizeEl && recipe.servingSize !== undefined) {
-  servingSizeEl.textContent = `Serves: ${recipe.servingSize}`;
-} else if (servingSizeEl) {
-  servingSizeEl.textContent = `Serves: ?`;
-}
+  }
 
-
+  // Render serving size
+  const servingSizeEl = document.getElementById("servingSizeDisplay");
+  if (servingSizeEl) {
+    servingSizeEl.textContent = recipe.servingSize
+      ? `Serves: ${recipe.servingSize}`
+      : "Serves: ?";
+  }
 }
 
 function renderPlanner() {
@@ -1011,7 +1093,7 @@ function updatePlanner(dayId) {
 
   if (!plannerSelections[season]) plannerSelections[season] = {};
   plannerSelections[season][dayId] = { main, sides, week: inferredWeek };
-  localStorage.setItem("plannerSelections", JSON.stringify(plannerSelections));
+  db.collection("plannerSelections").doc("default").set(plannerSelections);
 }
 
 
@@ -1170,8 +1252,9 @@ function readableUnit(qty, baseUnit) {
     if (qty >= 6) return { qty: qty / 6, unit: "oz" };
     if (qty >= 3) return { qty: qty / 3, unit: "tbsp" };
   }
-  return { qty, unit: baseUnit };
 console.log("Planner data for season:", season, plannerSelections[season]);
+return { qty, unit: baseUnit };
+
 
 }
 
@@ -1247,7 +1330,7 @@ function renderExclusionList() {
     removeBtn.style.marginLeft = "10px";
     removeBtn.onclick = () => {
       exclusionList.splice(index, 1);
-      localStorage.setItem("exclusionList", JSON.stringify(exclusionList));
+      db.collection("settings").doc("exclusionList").set({ items: exclusionList });
       renderExclusionList();
     };
     li.appendChild(removeBtn);
@@ -1255,21 +1338,23 @@ function renderExclusionList() {
   });
 }
 
+
 function addToExclusionList() {
   const input = document.getElementById("newExclusionInput");
   const value = normalizeIngredient(input.value);
   if (value && !exclusionList.includes(value)) {
     exclusionList.push(value);
-    localStorage.setItem("exclusionList", JSON.stringify(exclusionList));
+    db.collection("settings").doc("exclusionList").set({ items: exclusionList });
     renderExclusionList();
     input.value = "";
   }
 }
 
+
 function updateCategory(itemName, newCategory) {
   const lowerName = itemName.toLowerCase().trim();
   customCategoryMap[lowerName] = newCategory;
-  localStorage.setItem("customCategoryMap", JSON.stringify(customCategoryMap));
+  db.collection("settings").doc("customCategoryMap").set(customCategoryMap);
 
   // Rebuild categorized list and re-render
   const categorized = {};
@@ -1281,6 +1366,7 @@ function updateCategory(itemName, newCategory) {
   window.categorized = categorized;
   renderGroceryList();
 }
+
 function updateConcatenatedItem(index, value) {
   const parts = value.trim().split(/\s+/);
   const qty = parseFloat(parts[0]);
@@ -1377,9 +1463,12 @@ deleteBtn.onclick = () => {
   if (confirm(`Delete recipe "${r.name}"?`)) {
     const index = recipes.findIndex(rec => rec.name === r.name);
     if (index !== -1) {
-      recipes.splice(index, 1);
-      localStorage.setItem("recipes", JSON.stringify(recipes));
-      renderGallery(); // refresh view
+const recipeName = r.name;
+db.collection("recipes").doc(recipeName).delete().then(() => {
+  recipes.splice(index, 1);
+  renderGallery();
+});
+
     }
   }
 };
@@ -1398,12 +1487,11 @@ card.appendChild(buttonRow);
   });
 }
 
-
 function saveNewRecipe() {
   const name = document.getElementById("newRecipeName").value.trim();
   const description = document.getElementById("newRecipeDesc").value.trim();
   const cookTime = parseInt(document.getElementById("newRecipeTime").value);
-const servingSize = parseInt(document.getElementById("newRecipeServings").value, 10);
+  const servingSize = parseInt(document.getElementById("newRecipeServings").value, 10);
 
   const season = document.getElementById("newRecipeSeason").value;
   const imageInput = document.getElementById("newRecipeImage").value.trim();
@@ -1429,7 +1517,7 @@ const servingSize = parseInt(document.getElementById("newRecipeServings").value,
     name,
     description,
     cookTime,
-servingSize,
+    servingSize,
     season,
     ingredients,
     instructions,
@@ -1446,14 +1534,13 @@ servingSize,
   }
 
   recipes.push(newRecipe);
-  localStorage.setItem("recipes", JSON.stringify(recipes));
 
-  // 🔄 Refresh planner and gallery
-  renderPlanner();
-  renderGallery();
-
-  alert("Recipe saved!");
-  showPage("plannerPage");
+  db.collection("recipes").doc(newRecipe.name).set(newRecipe).then(() => {
+    renderPlanner();
+    renderGallery();
+    alert("Recipe saved!");
+    showPage("plannerPage");
+  });
 }
 function loadRecipeForEditing(recipe) {
   showPage("addRecipePage");
@@ -1524,56 +1611,6 @@ function toggleCategoryDropdown() {
   showCategoryDropdown = !showCategoryDropdown;
   renderGroceryList();
 }
-async function fetchRecipe() {
-  const url = document.getElementById("recipeUrlInput").value.trim();
-  if (!url || !url.startsWith("http")) {
-    alert("Please enter a valid recipe URL");
-    return;
-  }
-
-  const apiKey = "a8892aef72ab430491d448b40df821bd"; // 🔁 Replace with your actual key
-  const endpoint = `https://api.spoonacular.com/recipes/extract?url=${encodeURIComponent(url)}&apiKey=${apiKey}`;
-
-  try {
-    const res = await fetch(endpoint);
-    const data = await res.json();
-if (data.status === "failure" || data.code === 400 || data.message) {
-  alert(data.message || "Spoonacular failed to extract recipe.");
-  return;
-}
-
-console.log("Spoonacular response:", data);
-
-    if (!data.title) {
-      alert("Could not extract recipe from this URL. Try another one.");
-      return;
-    }
-
-    const ingredients = (data.extendedIngredients || []).map(ing => ({
-      name: normalizeIngredient(ing.name),
-      qty: ing.amount,
-      unit: ing.unit
-    }));
-
-    const instructions = data.analyzedInstructions?.[0]?.steps?.map(s => s.step) || [];
-
-    populateRecipeForm({
-      name: data.title,
-      description: data.summary || "",
-      cookTime: data.readyInMinutes || 0,
-      servings: data.servings || "",
-      image: data.image || fallbackImage,
-      ingredients,
-      instructions,
-      notes: []
-    });
-
-  } catch (err) {
-    console.error("Spoonacular API error:", err);
-    alert("Failed to fetch recipe. Please try again later.");
-  }
-}
-
 
 function populateRecipeForm(data) {
   showPage("addRecipePage");
@@ -1626,8 +1663,14 @@ function confirmDeleteRecipe() {
 
   const index = recipes.findIndex(r => r.name === recipeName);
   if (index !== -1) {
-    recipes.splice(index, 1);
-    localStorage.setItem("recipes", JSON.stringify(recipes));
+db.collection("recipes").doc(recipeName).delete().then(() => {
+  recipes.splice(index, 1);
+  renderPlanner();
+  renderGallery();
+  alert(`"${recipeName}" deleted.`);
+  showPage("plannerPage");
+});
+
 
     // 🔄 Refresh planner and gallery
     renderPlanner();
@@ -1644,7 +1687,7 @@ async function fetchRecipe() {
     return;
   }
 
-  const apiKey = "a8892aef72ab430491d448b40df821bd"; // ← Replace with your actual key in quotes
+  const apiKey = "a8892aef72ab430491d448b40df821bd"; // ← Replace with your actual key
   const endpoint = `https://api.spoonacular.com/recipes/extract?url=${encodeURIComponent(url)}&apiKey=${apiKey}`;
 
   try {
@@ -1668,36 +1711,27 @@ async function fetchRecipe() {
 
     const instructions = data.analyzedInstructions?.[0]?.steps?.map(s => s.step) || [];
 
-    populateRecipeForm({
+    const newRecipe = {
       name: data.title,
       description: data.summary || "",
       cookTime: data.readyInMinutes || 0,
-      servings: data.servings || "",
+      servingSize: data.servings || "",
       image: data.image || fallbackImage,
       ingredients,
       instructions,
       notes: []
-    });
+    };
 
-    // ✅ Save to recipes array and localStorage
-    recipes.push({
-      name: data.title,
-      description: data.summary || "",
-      cookTime: data.readyInMinutes || 0,
-      servings: data.servings || "",
-      image: data.image || fallbackImage,
-      season: "Spring/Summer", // default
-      ingredients,
-      instructions,
-      notes: []
-    });
-    localStorage.setItem("recipes", JSON.stringify(recipes));
+    recipes.push(newRecipe);
+    await db.collection("recipes").doc(newRecipe.name).set(newRecipe); // ✅ Now inside async block
 
+    populateRecipeForm(newRecipe);
   } catch (err) {
     console.error("Spoonacular API error:", err);
     alert("Failed to fetch recipe. Please try again later.");
   }
 }
+
 
 function clearRecipe(dayId) {
   const clearBtn = document.getElementById(`${dayId}-clearBtn`);
@@ -1714,7 +1748,8 @@ if (clearBtn) clearBtn.style.display = "none";
   const season = document.getElementById("seasonSelect").value;
   if (!plannerSelections[season]) plannerSelections[season] = {};
   plannerSelections[season][dayId] = { main: "", sides: [], week: parseInt(document.getElementById("weekSelect").value) };
-  localStorage.setItem("plannerSelections", JSON.stringify(plannerSelections));
+  db.collection("plannerSelections").doc("default").set(plannerSelections);
+
 }
 function updateClearButtons() {
   const mode = document.getElementById("plannerMode").value;
@@ -1751,35 +1786,24 @@ function renderExclusionList(target = "exclusionListDisplay") {
     removeBtn.style.marginLeft = "10px";
     removeBtn.onclick = () => {
       exclusionList.splice(index, 1);
-      localStorage.setItem("exclusionList", JSON.stringify(exclusionList));
+      db.collection("settings").doc("exclusionList").set({ items: exclusionList });
       renderExclusionList(target);
     };
     li.appendChild(removeBtn);
     ul.appendChild(li);
   });
 }
-function addToExclusionSidebar() {
-  const input = document.getElementById("newExclusionSidebarInput");
-  const value = normalizeIngredient(input.value);
-  if (value && !exclusionList.includes(value)) {
-    exclusionList.push(value);
-    localStorage.setItem("exclusionList", JSON.stringify(exclusionList));
-    renderExclusionList("exclusionListSidebar");
-    input.value = "";
-  }
-}
-
-
 function addToExclusionList() {
   const input = document.getElementById("newExclusionInput");
   const value = normalizeIngredient(input.value);
   if (value && !exclusionList.includes(value)) {
     exclusionList.push(value);
-    localStorage.setItem("exclusionList", JSON.stringify(exclusionList));
+    db.collection("settings").doc("exclusionList").set({ items: exclusionList });
     renderExclusionList();
     input.value = "";
   }
 }
+
 
 function toggleExclusionSidebar() {
   const sidebar = document.getElementById("exclusionSidebar");
@@ -1789,8 +1813,9 @@ function toggleExclusionSidebar() {
 }
 
 function renderExclusionSidebar() {
-  const ul = document.getElementById("exclusionListSidebar");
-  ul.innerHTML = "";
+const el = document.getElementById("exclusionListSidebar");
+if (el) el.innerHTML = "...";
+
   exclusionList.forEach((item, index) => {
     const li = document.createElement("li");
     li.textContent = item;
@@ -1799,7 +1824,7 @@ function renderExclusionSidebar() {
     removeBtn.style.marginLeft = "10px";
     removeBtn.onclick = () => {
       exclusionList.splice(index, 1);
-      localStorage.setItem("exclusionList", JSON.stringify(exclusionList));
+      db.collection("settings").doc("exclusionList").set({ items: exclusionList });
       renderExclusionSidebar();
     };
     li.appendChild(removeBtn);
@@ -1807,16 +1832,18 @@ function renderExclusionSidebar() {
   });
 }
 
+
 function addToExclusionSidebar() {
   const input = document.getElementById("newExclusionSidebarInput");
   const value = normalizeIngredient(input.value);
   if (value && !exclusionList.includes(value)) {
     exclusionList.push(value);
-    localStorage.setItem("exclusionList", JSON.stringify(exclusionList));
+    db.collection("settings").doc("exclusionList").set({ items: exclusionList });
     renderExclusionSidebar();
     input.value = "";
   }
 }
+
 
 function renderConversionTable() {
   const tbody = document.getElementById("conversionTableBody");
@@ -1839,7 +1866,7 @@ function renderConversionTable() {
     deleteBtn.style.marginLeft = "10px";
     deleteBtn.onclick = () => {
       delete unitConversion[from];
-      localStorage.setItem("unitConversion", JSON.stringify(unitConversion));
+      db.collection("settings").doc("unitConversion").set(unitConversion);
       renderConversionTable();
     };
 
@@ -1851,9 +1878,9 @@ function renderConversionTable() {
     row.appendChild(factorCell);
     row.appendChild(actionCell);
     tbody.appendChild(row);
-  });
+  }); // ← this closes forEach
+} // ← this closes renderConversionTable
 
-}
 
 function addConversion() {
   const from = document.getElementById("newFromUnit").value.trim();
@@ -1866,13 +1893,14 @@ function addConversion() {
   }
 
   unitConversion[from] = { to, factor };
-  localStorage.setItem("unitConversion", JSON.stringify(unitConversion));
+  db.collection("settings").doc("unitConversion").set(unitConversion);
   renderConversionTable();
 
   document.getElementById("newFromUnit").value = "";
   document.getElementById("newToUnit").value = "";
   document.getElementById("newFactor").value = "";
 }
+
 
 
 
