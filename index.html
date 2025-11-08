@@ -1263,10 +1263,7 @@ function generateGroceryList() {
   window.categorized = categorized;
 
   // Step 5: Render
-  renderGroceryList();
-}
-
-function renderGroceryList() {
+  function renderGroceryList() {
   const ul = document.getElementById("groceryList");
   ul.innerHTML = "";
 
@@ -1281,13 +1278,10 @@ function renderGroceryList() {
       const li = document.createElement("li");
       li.style.display = "flex";
       li.style.alignItems = "center";
-      li.style.justifyContent = "flex-start";
-      li.style.flexWrap = "wrap";
-      li.style.gap = "12px";
+      li.style.gap = "8px"; // ✅ tighter spacing
       li.style.marginBottom = "8px";
       li.style.width = "100%";
 
-      // Concatenate qty + unit + name
       const { qty: displayQty, unit: displayUnit } = readableUnit(item.qty, item.unit);
       const displayText = `${Math.round(displayQty * 100) / 100} ${displayUnit} ${item.name}`;
 
@@ -1301,23 +1295,17 @@ function renderGroceryList() {
       input.type = "text";
       input.value = displayText;
       input.onchange = () => updateConcatenatedItem(index, input.value);
-      input.style.flex = "1";
-      input.style.minWidth = "160px";
       input.style.border = "none";
       input.style.background = "transparent";
       input.style.fontSize = "1rem";
       input.style.padding = "6px 0";
       input.style.margin = "0";
+      input.style.flex = "none"; // ✅ prevent stretching
+      input.style.width = "auto"; // ✅ shrink to fit content
+      input.style.maxWidth = "calc(100% - 40px)"; // ✅ prevent overflow
 
-      const wrapper = document.createElement("div");
-      wrapper.style.display = "flex";
-      wrapper.style.alignItems = "center";
-      wrapper.style.gap = "12px";
-      wrapper.style.flex = "1";
-
-      wrapper.appendChild(checkbox);
-      wrapper.appendChild(input);
-      li.appendChild(wrapper);
+      li.appendChild(checkbox);
+      li.appendChild(input);
 
       if (showCategoryDropdown) {
         const categorySelect = document.createElement("select");
@@ -1333,7 +1321,7 @@ function renderGroceryList() {
           categorySelect.appendChild(opt);
         });
         categorySelect.onchange = () => updateCategory(item.name, categorySelect.value);
-        categorySelect.style.flex = "1";
+        categorySelect.style.flex = "none";
         categorySelect.style.minWidth = "140px";
         categorySelect.style.marginLeft = "0";
         li.appendChild(categorySelect);
@@ -1343,6 +1331,7 @@ function renderGroceryList() {
     });
   });
 }
+
 
 
 function renderExclusionList() {
