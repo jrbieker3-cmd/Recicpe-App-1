@@ -1263,7 +1263,10 @@ function generateGroceryList() {
   window.categorized = categorized;
 
   // Step 5: Render
-  function renderGroceryList() {
+  renderGroceryList();
+}
+
+function renderGroceryList() {
   const ul = document.getElementById("groceryList");
   ul.innerHTML = "";
 
@@ -1331,7 +1334,6 @@ function generateGroceryList() {
     });
   });
 }
-
 
 
 function renderExclusionList() {
