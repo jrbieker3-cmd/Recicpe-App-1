@@ -333,6 +333,7 @@ button:hover {
 }
 
 /* -------------------- Mobile Styles -------------------- */
+/* -------------------- Mobile Styles -------------------- */
 @media (max-width: 480px) {
   .planner-label {
     display: none;
@@ -374,7 +375,27 @@ button:hover {
     text-align: center;
     margin-bottom: 6px;
   }
+
+  #groceryList li {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  #groceryList input,
+  #groceryList select {
+    width: 100%;
+    font-size: 1rem;
+    padding: 6px;
+  }
+
+  #groceryList input[type="checkbox"] {
+    transform: scale(1.2);
+    margin-bottom: 6px;
+  }
 }
+
 </style>
 
 
@@ -1253,58 +1274,66 @@ function renderGroceryList() {
   categories.forEach(cat => {
     const header = document.createElement("li");
     header.innerHTML = `<strong>${cat}</strong>`;
+    header.style.marginTop = "12px";
     ul.appendChild(header);
 
     (window.categorized[cat] || []).forEach((item, index) => {
-  const li = document.createElement("li");
-  li.style.display = "flex";
-  li.style.alignItems = "center";
-  li.style.gap = "12px"; // controls spacing between input and dropdown
-  li.style.marginBottom = "6px";
+      const li = document.createElement("li");
+      li.style.display = "flex";
+      li.style.flexWrap = "wrap"; // ✅ allow wrapping on small screens
+      li.style.alignItems = "center";
+      li.style.gap = "8px";
+      li.style.marginBottom = "8px";
+      li.style.width = "100%";
 
-  // Concatenate qty + unit + name
-  const { qty: displayQty, unit: displayUnit } = readableUnit(item.qty, item.unit);
-  const displayText = `${Math.round(displayQty * 100) / 100} ${displayUnit} ${item.name}`;
+      // Concatenate qty + unit + name
+      const { qty: displayQty, unit: displayUnit } = readableUnit(item.qty, item.unit);
+      const displayText = `${Math.round(displayQty * 100) / 100} ${displayUnit} ${item.name}`;
 
-  const checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.onchange = () => toggleStrike(checkbox);
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.onchange = () => toggleStrike(checkbox);
+      checkbox.style.transform = "scale(1.2)";
+      checkbox.style.marginRight = "4px";
 
-  const input = document.createElement("input");
-  input.type = "text";
-  input.value = displayText;
-  input.onchange = () => updateConcatenatedItem(index, input.value);
-  input.style.width = "200px";
-  input.style.border = "none";
-  input.style.background = "transparent";
-  input.style.fontSize = "1rem";
+      const input = document.createElement("input");
+      input.type = "text";
+      input.value = displayText;
+      input.onchange = () => updateConcatenatedItem(index, input.value);
+      input.style.flex = "1";
+      input.style.minWidth = "160px";
+      input.style.border = "none";
+      input.style.background = "transparent";
+      input.style.fontSize = "1rem";
 
-  li.appendChild(checkbox);
-  li.appendChild(input);
+      li.appendChild(checkbox);
+      li.appendChild(input);
 
-  if (showCategoryDropdown) {
-    const categorySelect = document.createElement("select");
-    const categoryOptions = [
-      "Produce", "Dairy", "Deli", "Meat", "Canned", "Soups",
-      "Condiments & Sauces", "Pasta", "Crackers & Chips", "Essentials", "Other"
-    ];
-    categoryOptions.forEach(option => {
-      const opt = document.createElement("option");
-      opt.value = option;
-      opt.textContent = option;
-      if (option === cat) opt.selected = true;
-      categorySelect.appendChild(opt);
-    });
-    categorySelect.onchange = () => updateCategory(item.name, categorySelect.value);
-    categorySelect.style.width = "160px";
-    categorySelect.style.marginLeft = "0"; // no push to right
-    li.appendChild(categorySelect);
-  }
+      if (showCategoryDropdown) {
+        const categorySelect = document.createElement("select");
+        const categoryOptions = [
+          "Produce", "Dairy", "Deli", "Meat", "Canned", "Soups",
+          "Condiments & Sauces", "Pasta", "Crackers & Chips", "Essentials", "Other"
+        ];
+        categoryOptions.forEach(option => {
+          const opt = document.createElement("option");
+          opt.value = option;
+          opt.textContent = option;
+          if (option === cat) opt.selected = true;
+          categorySelect.appendChild(opt);
+        });
+        categorySelect.onchange = () => updateCategory(item.name, categorySelect.value);
+        categorySelect.style.flex = "1";
+        categorySelect.style.minWidth = "140px";
+        categorySelect.style.marginLeft = "0";
+        li.appendChild(categorySelect);
+      }
 
       ul.appendChild(li);
-    }); // closes inner forEach
-  });   // closes outer forEach
-}       // closes renderGroceryList
+    });
+  });
+}
+
 
 function renderExclusionList() {
   const ul = document.getElementById("exclusionListDisplay");
