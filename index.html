@@ -1280,9 +1280,10 @@ function renderGroceryList() {
     (window.categorized[cat] || []).forEach((item, index) => {
       const li = document.createElement("li");
       li.style.display = "flex";
-      li.style.flexWrap = "wrap"; // ✅ allow wrapping on small screens
       li.style.alignItems = "center";
-      li.style.gap = "8px";
+      li.style.justifyContent = "flex-start";
+      li.style.flexWrap = "wrap";
+      li.style.gap = "12px";
       li.style.marginBottom = "8px";
       li.style.width = "100%";
 
@@ -1294,7 +1295,7 @@ function renderGroceryList() {
       checkbox.type = "checkbox";
       checkbox.onchange = () => toggleStrike(checkbox);
       checkbox.style.transform = "scale(1.2)";
-      checkbox.style.marginRight = "4px";
+      checkbox.style.margin = "0";
 
       const input = document.createElement("input");
       input.type = "text";
@@ -1305,9 +1306,18 @@ function renderGroceryList() {
       input.style.border = "none";
       input.style.background = "transparent";
       input.style.fontSize = "1rem";
+      input.style.padding = "6px 0";
+      input.style.margin = "0";
 
-      li.appendChild(checkbox);
-      li.appendChild(input);
+      const wrapper = document.createElement("div");
+      wrapper.style.display = "flex";
+      wrapper.style.alignItems = "center";
+      wrapper.style.gap = "12px";
+      wrapper.style.flex = "1";
+
+      wrapper.appendChild(checkbox);
+      wrapper.appendChild(input);
+      li.appendChild(wrapper);
 
       if (showCategoryDropdown) {
         const categorySelect = document.createElement("select");
