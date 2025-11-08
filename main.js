@@ -1,4 +1,4 @@
-import { db, spoonacularKey } from "./firebase";
+import { db, spoonacularKey } from "./firebase.js";
 
 // 🔍 Fetch recipe from Spoonacular
 async function fetchRecipe() {
