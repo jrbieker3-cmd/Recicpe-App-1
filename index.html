@@ -1203,11 +1203,10 @@ function handleImageClick(dayId) {
 function generateGroceryList() {
   const season = document.getElementById("seasonSelect").value;
   const selectedWeek = parseInt(document.getElementById("weekSelect").value);
-
-  // Step 1: Count how many times each recipe appears in the selected week
-  const recipeCounts = {};
   const seasonData = plannerSelections[season] || {};
 
+  // Count recipe appearances
+  const recipeCounts = {};
   Object.entries(seasonData).forEach(([dayId, sel]) => {
     const weekMatch = dayId.match(/^W(\d)D\d$/);
     const weekNum = weekMatch ? parseInt(weekMatch[1]) : null;
@@ -1220,20 +1219,19 @@ function generateGroceryList() {
     });
   });
 
-  // Step 2: Build grocery list with scaled ingredients
-  const list = [];
+  // Build and normalize grocery list
+  const rawList = [];
   Object.entries(recipeCounts).forEach(([name, count]) => {
     const recipe = recipes.find(r => r.name === name);
     if (!recipe) return;
-
     recipe.ingredients.forEach(({ name, qty, unit }) => {
-      list.push({ name, qty: qty * count, unit });
+      rawList.push({ name, qty: qty * count, unit });
     });
   });
 
-  // Step 3: Group and sum ingredients
+  // Group and sum ingredients
   const grouped = {};
-  list.forEach(({ name, qty, unit }) => {
+  rawList.forEach(({ name, qty, unit }) => {
     const normalizedName = normalizeIngredient(name);
     if (exclusionList.includes(normalizedName)) return;
 
@@ -1248,7 +1246,7 @@ function generateGroceryList() {
 
   groceryList = Object.values(grouped);
 
-  // Step 4: Categorize items
+  // Categorize items
   const categorized = {};
   groceryList.forEach(item => {
     const category =
@@ -1259,10 +1257,10 @@ function generateGroceryList() {
     categorized[category].push(item);
   });
 
-  // Make categorized globally accessible
   window.categorized = categorized;
+  renderGroceryList();
+}
 
-  // Step 5: Render
   function renderGroceryList() {
   const ul = document.getElementById("groceryList");
   ul.innerHTML = "";
@@ -1277,13 +1275,13 @@ function generateGroceryList() {
     (window.categorized[cat] || []).forEach((item, index) => {
       const li = document.createElement("li");
       li.style.display = "flex";
-      li.style.flexDirection = "column"; // ✅ stack everything vertically
+      li.style.flexDirection = "column";
       li.style.marginBottom = "8px";
       li.style.width = "100%";
 
       const row = document.createElement("div");
       row.style.display = "flex";
-      row.style.alignItems = "center"; // ✅ vertical centering
+      row.style.alignItems = "center";
       row.style.gap = "10px";
       row.style.width = "100%";
 
