@@ -4,12 +4,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta charset="UTF-8" />
   <title>Recipe App</title>
+<!-- ✅ Load Firebase libraries first -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   };
-
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
- <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <style>
 
 /* -------------------- Base Styles -------------------- */
@@ -561,24 +559,21 @@ button:hover {
     </div>
   </div>
 
+<!-- ✅ Then initialize Firebase -->
 <script>
-    // ✅ Replace these values with your Firebase project config
-const firebaseConfig = {
-  apiKey: "AIzaSyCRKIl3a3zWRT5V2Ds3gCzG8Mjk42rE1lc",
-  authDomain: "recipe-app-4549f.firebaseapp.com",
-  projectId: "recipe-app-4549f",
-  storageBucket: "recipe-app-4549f.firebasestorage.app",
-  messagingSenderId: "931787521865",
-  appId: "1:931787521865:web:bcf4dc545abf509efda498",
-  measurementId: "G-DSYGZM893N"
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyCRKIl3a3zWRT5V2Ds3gCzG8Mjk42rE1lc",
+    authDomain: "recipe-app-4549f.firebaseapp.com",
+    projectId: "recipe-app-4549f",
+    storageBucket: "recipe-app-4549f.firebasestorage.app",
+    messagingSenderId: "931787521865",
+    appId: "1:931787521865:web:bcf4dc545abf509efda498",
+    measurementId: "G-DSYGZM893N"
+  };
 
-    // ✅ Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
-    // ✅ Make it global so all your functions can use it
-    window.db = db;
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  window.db = db; // ✅ Make Firestore globally accessible
 
     // ✅ Initialize variables early to prevent ReferenceError
 let plannerSelections = {}; // ✅ Declare once globally
@@ -1190,23 +1185,24 @@ function generateGroceryList() {
 
   // Step 1: Count how many times each recipe appears in the selected week
   const recipeCounts = {};
+  const seasonData = plannerSelections[season] || {};
 
-const seasonData = plannerSelections[season] || {};
-Object.entries(seasonData).forEach(([_, sel]) => {
-  if (sel.week === selectedWeek) {
-      const allRecipes = [sel.main, ...(sel.sides || [])];
-      allRecipes.forEach(name => {
-        if (!name) return;
-        recipeCounts[name] = (recipeCounts[name] || 0) + 1;
-      });
-    }
+  Object.entries(seasonData).forEach(([dayId, sel]) => {
+    const weekMatch = dayId.match(/^W(\d)D\d$/);
+    const weekNum = weekMatch ? parseInt(weekMatch[1]) : null;
+    if (weekNum !== selectedWeek) return;
+
+    const allRecipes = [sel.main, ...(sel.sides || [])];
+    allRecipes.forEach(name => {
+      if (!name) return;
+      recipeCounts[name] = (recipeCounts[name] || 0) + 1;
+    });
   });
 
   // Step 2: Build grocery list with scaled ingredients
   const list = [];
-
   Object.entries(recipeCounts).forEach(([name, count]) => {
-    const recipe = recipes.find(r => r.name === name && r.season === season);
+    const recipe = recipes.find(r => r.name === name);
     if (!recipe) return;
 
     recipe.ingredients.forEach(({ name, qty, unit }) => {
@@ -1216,26 +1212,28 @@ Object.entries(seasonData).forEach(([_, sel]) => {
 
   // Step 3: Group and sum ingredients
   const grouped = {};
-list.forEach(({ name, qty, unit }) => {
-  const normalizedName = normalizeIngredient(name);
-  if (exclusionList.includes(normalizedName)) return;
+  list.forEach(({ name, qty, unit }) => {
+    const normalizedName = normalizeIngredient(name);
+    if (exclusionList.includes(normalizedName)) return;
 
-  const baseUnit = unitConversion[unit]?.to || unit;
-  const factor = unitConversion[unit]?.factor || 1;
-  const normalizedQty = qty * factor;
-  const key = `${normalizedName}-${baseUnit}`;
+    const baseUnit = unitConversion[unit]?.to || unit;
+    const factor = unitConversion[unit]?.factor || 1;
+    const normalizedQty = qty * factor;
+    const key = `${normalizedName}-${baseUnit}`;
 
-  if (!grouped[key]) grouped[key] = { name: normalizedName, qty: 0, unit: baseUnit };
-  grouped[key].qty += normalizedQty;
-});
-
+    if (!grouped[key]) grouped[key] = { name: normalizedName, qty: 0, unit: baseUnit };
+    grouped[key].qty += normalizedQty;
+  });
 
   groceryList = Object.values(grouped);
 
   // Step 4: Categorize items
   const categorized = {};
   groceryList.forEach(item => {
-    const category = categorizeItem(item.name);
+    const category =
+      customCategoryMap[item.name] ||
+      categoryMap[item.name.toLowerCase()] ||
+      "Other";
     if (!categorized[category]) categorized[category] = [];
     categorized[category].push(item);
   });
@@ -1245,17 +1243,6 @@ list.forEach(({ name, qty, unit }) => {
 
   // Step 5: Render
   renderGroceryList();
-}
-function readableUnit(qty, baseUnit) {
-  if (baseUnit === "tsp") {
-    if (qty >= 48) return { qty: qty / 48, unit: "cup" };
-    if (qty >= 6) return { qty: qty / 6, unit: "oz" };
-    if (qty >= 3) return { qty: qty / 3, unit: "tbsp" };
-  }
-console.log("Planner data for season:", season, plannerSelections[season]);
-return { qty, unit: baseUnit };
-
-
 }
 
 function renderGroceryList() {
@@ -1339,16 +1326,21 @@ function renderExclusionList() {
 }
 
 
-function addToExclusionList() {
-  const input = document.getElementById("newExclusionInput");
-  const value = normalizeIngredient(input.value);
-  if (value && !exclusionList.includes(value)) {
-    exclusionList.push(value);
+function addToExclusionSidebar() {
+  const input = document.getElementById("newExclusionSidebarInput");
+  const value = input.value.trim();
+  if (!value) return;
+
+  const normalized = normalizeIngredient(value);
+  if (!exclusionList.includes(normalized)) {
+    exclusionList.push(normalized);
     db.collection("settings").doc("exclusionList").set({ items: exclusionList });
-    renderExclusionList();
-    input.value = "";
+    renderExclusionList(); // or renderSidebarList() if you have a separate one
   }
+
+  input.value = "";
 }
+
 
 
 function updateCategory(itemName, newCategory) {
@@ -1813,12 +1805,13 @@ function toggleExclusionSidebar() {
 }
 
 function renderExclusionSidebar() {
-const el = document.getElementById("exclusionListSidebar");
-if (el) el.innerHTML = "...";
+  const ul = document.getElementById("exclusionListSidebar");
+  ul.innerHTML = "";
 
   exclusionList.forEach((item, index) => {
     const li = document.createElement("li");
     li.textContent = item;
+
     const removeBtn = document.createElement("button");
     removeBtn.textContent = "×";
     removeBtn.style.marginLeft = "10px";
@@ -1827,10 +1820,12 @@ if (el) el.innerHTML = "...";
       db.collection("settings").doc("exclusionList").set({ items: exclusionList });
       renderExclusionSidebar();
     };
+
     li.appendChild(removeBtn);
     ul.appendChild(li);
   });
 }
+
 
 
 function addToExclusionSidebar() {
